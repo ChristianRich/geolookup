@@ -1,0 +1,174 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>GeoLocator</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+
+    <style type="text/css">
+        body{
+            margin: 40px;
+        }
+
+        .top-space {
+            margin-top:20px
+        }
+
+        #map-canvas {
+            width: 400px;
+            height: 400px;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtmusquvPTCty7ym_Z7VZoYl3JDyvzoRs"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="page-header">
+            <h1>Google Maps API address formatter and geoLocator</h1>
+        </div>
+    </div>
+
+    <div class="row top-space ">
+        <div class="col-lg-6">
+
+            <div class="well small">Input address e.g. 388 Pitt St, Sydney</div>
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" onClick="getLocation();" type="button">Search</button>
+                </span>
+
+                <form id="form">
+                    <input type="text" placeholder="Address" class="form-control" id="address">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row top-space ">
+        <div class="col-lg-6">
+            <div class="log well"></div>
+        </div>
+    </div>
+
+    <div class="row top-space ">
+        <div class="col-lg-6">
+            <div id="map-canvas"></div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+    var map,
+        markersArray = [];
+
+    function getLocation() {
+
+        var geocoder = new google.maps.Geocoder();
+        var address = document.getElementById('address').value;
+
+        geocoder.geocode({ 'address': address }, function (results, status) {
+
+            if (status == google.maps.GeocoderStatus.OK) {
+                var longitude = results[0].geometry.location.lng();
+                var latitude = results[0].geometry.location.lat();
+
+                log(results[0].formatted_address + '</br>' + getGeolocation(results[0]));
+
+                //map.setCenter(results[0].geometry.location);
+
+                map.panTo(results[0].geometry.location);
+
+                clearOverlays();
+
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+
+                markersArray.push(marker);
+
+            } else {
+                log(status + " Request failed.")
+            }
+        });
+    }
+
+    function log(msg){
+        document.querySelector('.log').innerHTML = msg;
+    }
+
+    function clearOverlays() {
+        if (markersArray) {
+            for (i in markersArray) {
+                markersArray[i].setMap(null);
+            }
+        }
+
+        markersArray = [];
+    }
+
+    function parseGeocoderResult(res){
+
+        var streetNumber = res.address_components[0].long_name,
+            streetName = res.address_components[1].long_name,
+            suburb = res.address_components[2].long_name,
+            state = res.address_components[3].short_name,
+            county = res.address_components[4].long_name,
+            lng = res.geometry.location.lng(),
+            lat = res.geometry.location.lat();
+
+        return  'streetNumber: ' + streetNumber + '<br/>' +
+                'streetName: ' + streetName + '<br/>' +
+                'suburb: ' + suburb + '<br/>' +
+                'state: ' + state + '<br/>' +
+                'county: ' + county + '<br/>' +
+                'longtitude: ' + lng + '<br/>' +
+                'lattitude: ' + lat + '<br/>';
+    }
+
+    function getGeolocation(res){
+        var lng = res.geometry.location.lng(),
+            lat = res.geometry.location.lat();
+
+        return 'longtitude: ' + lng + '<br/>' +'lattitude: ' + lat + '<br/>';
+    }
+
+    function init(){
+
+        $('#form').submit(function(event){
+            event.preventDefault();
+            getLocation();
+        });
+
+        google.maps.event.addDomListener(window, 'load', initMaps);
+    }
+
+    function initMaps(){
+
+        var geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(-33.8771814, 151.20768369999996);
+
+        var mapOptions = {
+            zoom: 15,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            center: latlng
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    }
+
+    $(document).ready(function() {
+        init();
+    });
+
+</script>
+</body>
+</html>
