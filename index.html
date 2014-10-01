@@ -74,7 +74,10 @@
         var geocoder = new google.maps.Geocoder();
         var address = document.getElementById('address').value;
 
-        geocoder.geocode({ 'address': address }, function (results, status) {
+
+
+
+        geocoder.geocode({ 'address': address + ', Australia'}, function (results, status) {
 
             if (status == google.maps.GeocoderStatus.OK) {
                 var longitude = results[0].geometry.location.lng();
