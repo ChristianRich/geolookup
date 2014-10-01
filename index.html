@@ -20,6 +20,10 @@
             margin: 0;
             padding: 0;
         }
+
+        .hidden{
+            display: none
+        }
     </style>
 </head>
 <body>
@@ -36,7 +40,7 @@
         </div>
     </div>
 
-    <div class="row top-space ">
+    <div class="row top-space">
         <div class="col-lg-6">
 
             <div class="well small">Input address e.g. 388 Pitt St, Sydney</div>
@@ -52,13 +56,23 @@
         </div>
     </div>
 
-    <div class="row top-space ">
-        <div class="col-lg-6">
-            <div class="log well"></div>
+    <div class="row top-space">
+        <div class="col-lg-6 result">
+
+            <h3>Result</h3>
+
+            <h5 class="top-space">Formatted address</h5>
+            <div class="well formatted_address"></div>
+
+            <h5>Longitude</h5>
+            <div class="well lng"></div>
+
+            <h5>Latitude</h5>
+            <div class="well lat"></div>
         </div>
     </div>
 
-    <div class="row top-space ">
+    <div class="row top-space">
         <div class="col-lg-6">
             <div id="map-canvas"></div>
         </div>
@@ -74,18 +88,17 @@
         var geocoder = new google.maps.Geocoder();
         var address = document.getElementById('address').value;
 
-
-
-
         geocoder.geocode({ 'address': address + ', Australia'}, function (results, status) {
+
+            $('.result').removeClass('hidden');
 
             if (status == google.maps.GeocoderStatus.OK) {
                 var longitude = results[0].geometry.location.lng();
                 var latitude = results[0].geometry.location.lat();
 
-                log(results[0].formatted_address + '</br>' + getGeolocation(results[0]));
-
-                //map.setCenter(results[0].geometry.location);
+                $('.formatted_address').html(results[0].formatted_address);
+                $('.lng').html(longitude);
+                $('.lat').html(latitude);
 
                 map.panTo(results[0].geometry.location);
 
@@ -99,13 +112,11 @@
                 markersArray.push(marker);
 
             } else {
-                log(status + " Request failed.")
+                $('.formatted_address').html(status + ' Request failed.');
+                $('.lng').html('');
+                $('.lat').html('');
             }
         });
-    }
-
-    function log(msg){
-        document.querySelector('.log').innerHTML = msg;
     }
 
     function clearOverlays() {
@@ -137,14 +148,9 @@
                 'lattitude: ' + lat + '<br/>';
     }
 
-    function getGeolocation(res){
-        var lng = res.geometry.location.lng(),
-            lat = res.geometry.location.lat();
-
-        return 'longtitude: ' + lng + '<br/>' +'lattitude: ' + lat + '<br/>';
-    }
-
     function init(){
+
+        $('.result').addClass('hidden');
 
         $('#form').submit(function(event){
             event.preventDefault();
