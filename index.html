@@ -14,9 +14,18 @@
             margin-top:20px
         }
 
-        #map-canvas {
-            width: 400px;
-            height: 400px;
+        .map-container{
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* Ratio 16:9 ( 100%/16*9 = 56.25% ) */
+        }
+
+        .map-container #map-canvas{
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
             margin: 0;
             padding: 0;
         }
@@ -74,7 +83,9 @@
 
     <div class="row top-space">
         <div class="col-lg-6">
-            <div id="map-canvas"></div>
+            <div class="map-container">
+                <div id="map-canvas"></div>
+            </div>
         </div>
     </div>
 
@@ -172,6 +183,12 @@
         };
 
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        google.maps.event.addDomListener(window, "resize", function() {
+            var center = map.getCenter();
+            google.maps.event.trigger(map, "resize");
+            map.setCenter(center);
+        });
     }
 
     $(document).ready(function() {
