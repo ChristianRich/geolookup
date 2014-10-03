@@ -55,7 +55,7 @@
             <div class="well small">Input address e.g. 388 Pitt St, Sydney</div>
             <div class="input-group">
                 <span class="input-group-btn">
-                    <button class="btn btn-default" onClick="getLocation();" type="button">Search</button>
+                    <button class="btn btn-primary" onClick="getLocation();" type="button">Search</button>
                 </span>
 
                 <form id="form">
@@ -71,13 +71,26 @@
             <h3>Result</h3>
 
             <h5 class="top-space">Formatted address</h5>
-            <div class="well formatted_address"></div>
+
+            <div class="well">
+                <p class="formatted_address"></p>
+                <button id="select-address" class="btn btn-primary">Select</button>
+            </div>
 
             <h5>Longitude</h5>
-            <div class="well lng"></div>
+
+            <div class="well">
+                <p id="lng"></p>
+                <button id="select-lng" class="btn btn-primary">Select</button>
+            </div>
 
             <h5>Latitude</h5>
-            <div class="well lat"></div>
+
+            <div class="well">
+                <p id="lat"></p>
+                <button id="select-lat" class="btn btn-primary">Select</button>
+            </div>
+
         </div>
     </div>
 
@@ -108,8 +121,8 @@
                 var latitude = results[0].geometry.location.lat();
 
                 $('.formatted_address').html(results[0].formatted_address);
-                $('.lng').html(longitude);
-                $('.lat').html(latitude);
+                $('#lng').html(longitude);
+                $('#lat').html(latitude);
 
                 map.panTo(results[0].geometry.location);
 
@@ -140,6 +153,31 @@
         markersArray = [];
     }
 
+    function selectText(id) {
+
+        var range,
+            el = document.querySelector(id);
+
+        if(!el){
+            console.warn('Element not found');
+            return;
+        }
+
+        if(window.getSelection()){
+            window.getSelection().empty();
+        }
+
+        if (document.selection) { // legacy IE
+            range = document.body.createTextRange();
+            range.moveToElementText(el);
+            range.select();
+        } else if (window.getSelection) { // modern
+            range = document.createRange();
+            range.selectNode(el);
+            window.getSelection().addRange(range);
+        }
+    }
+
     function parseGeocoderResult(res){
 
         var streetNumber = res.address_components[0].long_name,
@@ -166,6 +204,18 @@
         $('#form').submit(function(event){
             event.preventDefault();
             getLocation();
+        });
+
+        $('#select-lng').click(function(event){
+            selectText('#lng');
+        });
+
+        $('#select-lat').click(function(event){
+            selectText('#lat');
+        });
+
+        $('#select-address').click(function(event){
+            selectText('.formatted_address');
         });
 
         google.maps.event.addDomListener(window, 'load', initMaps);
