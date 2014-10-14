@@ -75,6 +75,7 @@
             <div class="well">
                 <p class="formatted_address"></p>
                 <button id="select-address" class="btn btn-primary">Select</button>
+                <button id="add-address" class="btn btn-primary">Add</button>
             </div>
 
             <h5>Longitude</h5>
@@ -123,6 +124,9 @@
                 $('.formatted_address').html(results[0].formatted_address);
                 $('#lng').html(longitude);
                 $('#lat').html(latitude);
+
+
+                console.log(parseGeocoderResult(results[0]))
 
                 map.panTo(results[0].geometry.location);
 
@@ -188,13 +192,14 @@
             lng = res.geometry.location.lng(),
             lat = res.geometry.location.lat();
 
-        return  'streetNumber: ' + streetNumber + '<br/>' +
-                'streetName: ' + streetName + '<br/>' +
-                'suburb: ' + suburb + '<br/>' +
-                'state: ' + state + '<br/>' +
-                'county: ' + county + '<br/>' +
-                'longtitude: ' + lng + '<br/>' +
-                'lattitude: ' + lat + '<br/>';
+        return {
+            address: streetNumber + ' ' + streetName,
+            suburb: suburb,
+            state: state,
+            county: county,
+            longtitude: lng,
+            lattitude: lat
+        }
     }
 
     function init(){
