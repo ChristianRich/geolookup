@@ -102,11 +102,14 @@
             </div>
         </div>
     </div>
+</div>
 
 <script type="text/javascript">
 
     var map,
-        markersArray = [];
+        markersArray = [],
+        marker,
+        cloneMarker;
 
     function getLocation() {
 
@@ -125,17 +128,41 @@
                 $('#lng').html(longitude);
                 $('#lat').html(latitude);
 
-
-                console.log(parseGeocoderResult(results[0]))
+                //console.log(parseGeocoderResult(results[0]))
 
                 map.panTo(results[0].geometry.location);
 
                 clearOverlays();
 
-                var marker = new google.maps.Marker({
+                if(marker){
+                    marker.setMap(null);
+                }
+
+                if(cloneMarker){
+                    cloneMarker.setMap(null);
+                    cloneMarker = null;
+                }
+
+                marker = new google.maps.Marker({
                     map: map,
-                    position: results[0].geometry.location
+                    position: results[0].geometry.location,
+                    draggable : true
                 });
+
+                google.maps.event.addListener(marker, 'drag', function(e) {
+
+                    if(!cloneMarker){
+
+                        cloneMarker = new google.maps.Marker({
+                            map: map,
+                            position: new google.maps.LatLng(latitude, longitude),
+                            draggable : false
+                        });
+                    }
+
+                    $('#lng').html(e.latLng.lng());
+                    $('#lat').html(e.latLng.lat());
+                } );
 
                 markersArray.push(marker);
 
@@ -222,6 +249,8 @@
         $('#select-address').click(function(event){
             selectText('.formatted_address');
         });
+
+        $('#address').val('388 Pitt St');
 
         google.maps.event.addDomListener(window, 'load', initMaps);
     }
